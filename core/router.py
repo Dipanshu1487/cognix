@@ -1,6 +1,5 @@
 import json
 import re
-from core.brain import unified_brain_pipeline
 from core.voice import stop_speaking
 from core.response_engine import process_response
 
@@ -24,4 +23,5 @@ def _raw_route_command(command):
         return "Stopping"
 
     # 2. Unified Brain Pipeline (LoRA -> Gemini)
+    from core.brain import unified_brain_pipeline
     return unified_brain_pipeline(command)
