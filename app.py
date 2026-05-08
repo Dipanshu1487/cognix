@@ -14,14 +14,29 @@ def start_backend_if_needed():
     import time
     import sys
     
-    # 1. Health Check
+    # 1. Health Check & Force Restart if stale
     url = "http://127.0.0.1:8000/health"
     try:
         # 3s timeout to allow for slightly busy but responsive engines
         res = requests.get(url, timeout=3)
         if res.status_code == 200:
-            st.session_state.backend_started = True
-            return
+            # Check if we need a force restart (e.g., after code changes)
+            if st.sidebar.button("Force Restart Engine", help="Use this if the AI is behaving unexpectedly after an update."):
+                st.session_state.backend_started = False
+                # Continue to restart logic
+            else:
+                st.session_state.backend_started = True
+                return
+    except:
+        pass
+
+    # 2. Kill stale processes on port 8000 (Cloud & Local stability)
+    try:
+        if sys.platform == "win32":
+            subprocess.run("taskkill /f /im python.exe /fi \"windowtitle eq uvicorn*\"", shell=True, stderr=subprocess.DEVNULL)
+        else:
+            # Linux (Cloud) way to free up the port
+            subprocess.run("fuser -k 8000/tcp", shell=True, stderr=subprocess.DEVNULL)
     except:
         pass
 
