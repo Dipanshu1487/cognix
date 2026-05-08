@@ -27,7 +27,7 @@ def verify_environment():
 # Initialize Brain/LoRA check (already handled in brain.py but we can verify here too)
 env_stable = verify_environment()
 
-from core.brain import process_query
+from core.brain import unified_brain_pipeline
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -74,7 +74,7 @@ async def chat(request: QueryRequest):
     
     try:
         # Process the query using the existing unified pipeline
-        answer = process_query(request.query)
+        answer = unified_brain_pipeline(request.query)
         logger.info(f"Brain Result: {answer}")
         
         if not answer:
